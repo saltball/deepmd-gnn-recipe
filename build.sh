@@ -1,7 +1,5 @@
 #!/bin/bash
 
-mkdir -p build
-cd build
 if [[ "${target_platform}" != "${build_platform}" ]]; then
     export CUDA_TOOLKIT_ROOT=${CUDA_HOME}
 fi
@@ -42,11 +40,12 @@ fi
 PT_ABI_FLAG=$(python -c "import torch; print(int(torch.compiled_with_cxx11_abi()))")
 
 export CMAKE_PREFIX_PATH=$(python -c "import torch;print(torch.utils.cmake_prefix_path)")
+${PYTHON} -m pip install --no-deps --no-build-isolation . -vv
 
-pip install . 
-
+mkdir build -p
+cd build
 cmake -DCMAKE_PREFIX_PATH=$(python -c 'import torch; print(torch.utils.cmake_prefix_path)') \
-      -DCMAKE_INSTALL_PREFIX=${PREFIX}
+      -DCMAKE_INSTALL_PREFIX=${PREFIX} ..
 make -j${NUM_CPUS}
 make install
 

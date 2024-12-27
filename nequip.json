@@ -1,17 +1,30 @@
 {
   "_comment1": " model parameters",
   "model": {
-    "type": "mace",
+    "type": "nequip",
     "type_map": [
       "O",
       "H"
     ],
-    "r_max": 6.0,
+    "r_max": 5.0,
     "sel": "auto",
-    "hidden_irreps": "16x0e",
-    "_comment2": " that's all"
+    "num_layers": 4,
+    "l_max": 2,
+    "num_features": 32,
+    "nonlinearity_type": "gate",
+    "parity": true,
+    "num_basis": 8,
+    "BesselBasis_trainable": true,
+    "PolynomialCutoff_p": 6,
+    "invariant_layers": 2,
+    "invariant_neurons": 64,
+    "use_sc": true,
+    "irreps_edge_sh": "0e + 1e",
+    "feature_irreps_hidden": "32x0o + 32x0e + 32x1o + 32x1e",
+    "chemical_embedding_irreps_out": "32x0e",
+    "conv_to_output_hidden_irreps_out": "16x0e",
+    "precision": "float32"
   },
-
   "learning_rate": {
     "type": "exp",
     "decay_steps": 5000,
@@ -19,7 +32,6 @@
     "stop_lr": 0.0009,
     "_comment3": "that's all"
   },
-
   "loss": {
     "type": "ener",
     "start_pref_e": 0.02,
@@ -30,7 +42,6 @@
     "limit_pref_v": 0,
     "_comment4": " that's all"
   },
-
   "training": {
     "training_data": {
       "systems": [
@@ -54,6 +65,5 @@
     "save_freq": 1,
     "_comment7": "that's all"
   },
-
   "_comment8": "that's all"
 }

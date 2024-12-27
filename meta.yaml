@@ -1,4 +1,4 @@
-{% set name = "mace_lammps_plugin_atomv" %}
+{% set name = "deepmd-gnn" %}
 {% set build = 0 %}
 {% set proc_type = "cuda" if cuda_compiler_version != "None" else "cpu" %}
 {% set version = "0.1.0p1" %}
@@ -28,6 +28,7 @@ build:
 
 requirements:
   build:
+    - setuptools_scm
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('cuda') }}  # [cuda_compiler_version != "None"]
@@ -46,38 +47,23 @@ requirements:
     - make
     - gcc_linux-64  # [linux]
     - gxx_linux-64  # [linux]
-    - pytorch
-    - pytorch * {{proc_type}}*
-    - deepmd-kit[torch]>=3.0.0b2
+    - pytorch 2.4.1
 
 
   host:
+    - scikit-build-core
+    - setuptools_scm
     - cudnn  # [cuda_compiler_version != "None"]
-    - pytorch
-    - pytorch * {{proc_type}}*
+    - pytorch 2.4.1
     - python  {{ python_version }}
 
   run:
     - __cuda  # [cuda_compiler_version != "None"]
     - {{ pin_compatible('cudnn') }}  # [cuda_compiler_version != 'None']
-    - pytorch
-    - pytorch * {{ proc_type }}*
+    - pytorch 2.4.1
     - python  {{ python_version }}
-    - deepmd-kit[torch]>=3.0.0b2
-  
-
-test:
-  files:
-    - data/
-    - mace.json
-    - nequip.json
-  requires:
-    - pip
-  commands:
-    - dp --pt train mace.json
-    - dp --pt freeze
-    - dp --pt train nequip.json
-    - dp --pt freeze
+    - pymace
+    - nequip
 
 about:
   home: https://gitlab.com/RutgersLBSR/deepmd-gnn

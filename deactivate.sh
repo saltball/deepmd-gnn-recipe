@@ -1,2 +1,2 @@
 export LD_LIBRARY_PATH=$(echo ${LD_LIBRARY_PATH} | awk -v RS=: -v ORS=: '/torch/ {next} {print}' | sed 's/:*$//')
-export DP_PLUGIN_PATH=$(echo ${DP_PLUGIN_PATH} | awk -v RS=: -v ORS=: '/libdeepmd_gnn.so {next} {print}' | sed 's/:*$//')
+export DP_PLUGIN_PATH=$(echo ${DP_PLUGIN_PATH} | awk -v RS=: -v ORS=: '/libdeepmd_gnn.so/ {next} {print}' | sed 's/:*$//')
