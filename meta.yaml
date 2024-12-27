@@ -1,0 +1,91 @@
+{% set name = "mace_lammps_plugin_atomv" %}
+{% set build = 0 %}
+{% set proc_type = "cuda" if cuda_compiler_version != "None" else "cpu" %}
+{% set version = "0.1.0p1" %}
+
+# determine cuda version, refer to https://github.com/conda-forge/pytorch-cpu-feedstock/blob/main/recipe/meta.yaml
+{% if cuda_compiler_version in (None, "None", True, False) %}
+{% set cuda_major = 0 %}
+{% else %}
+{% set cuda_major = environ.get("cuda_compiler_version", "11.8").split(".")[0] | int %}
+{% endif %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  - git_url: https://github.com/deepmodeling/deepmd-gnn.git
+    # git_rev: atom_virial
+    # sha256: {{lammps_sha256}}
+
+build:
+  number: {{ build }}
+  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ python_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
+  string: cpu_py{{ python_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
+  skip: True  # [not linux]
+  skip: True  # [ppc64le]
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ compiler('cuda') }}  # [cuda_compiler_version != "None"]
+    - python {{ python_version }}
+    - cuda-nvcc {{ cuda_compiler_version }}  # [cuda_compiler_version != 'None']
+    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != 'None']
+    - cuda-tools {{ cuda_compiler_version }}  # [cuda_compiler_version != 'None']
+    - cuda-cudart-dev {{ cuda_compiler_version }}  # [cuda_compiler_version != 'None']
+  # require by pytorch
+    - libcublas-dev  # [cuda_compiler_version != 'None']
+    - libcurand-dev  # [cuda_compiler_version != 'None']
+    - libcufft-dev  # [cuda_compiler_version != 'None']
+    - cuda-nvrtc-dev  # [cuda_compiler_version != 'None']
+    - cuda-nvtx-dev  # [cuda_compiler_version != 'None']
+    - cmake
+    - make
+    - gcc_linux-64  # [linux]
+    - gxx_linux-64  # [linux]
+    - pytorch
+    - pytorch * {{proc_type}}*
+    - deepmd-kit[torch]>=3.0.0b2
+
+
+  host:
+    - cudnn  # [cuda_compiler_version != "None"]
+    - pytorch
+    - pytorch * {{proc_type}}*
+    - python  {{ python_version }}
+
+  run:
+    - __cuda  # [cuda_compiler_version != "None"]
+    - {{ pin_compatible('cudnn') }}  # [cuda_compiler_version != 'None']
+    - pytorch
+    - pytorch * {{ proc_type }}*
+    - python  {{ python_version }}
+    - deepmd-kit[torch]>=3.0.0b2
+  
+
+test:
+  files:
+    - data/
+    - mace.json
+    - nequip.json
+  requires:
+    - pip
+  commands:
+    - dp --pt train mace.json
+    - dp --pt freeze
+    - dp --pt train nequip.json
+    - dp --pt freeze
+
+about:
+  home: https://gitlab.com/RutgersLBSR/deepmd-gnn
+  license: LGPL-3.0
+  license_family: GPL
+  summary: 'DeePMD-kit plugin for various graph neural network models'
+
+  description: |
+    DeePMD-kit plugin for various graph neural network models
+  doc_url: https://gitlab.com/RutgersLBSR/deepmd-gnn
+  dev_url: https://gitlab.com/RutgersLBSR/deepmd-gnn
